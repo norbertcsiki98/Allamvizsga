@@ -555,6 +555,21 @@ public class Net {
 
 
     //
+    // C++:  void cv::dnn::Net::setInputShape(String inputName, MatShape shape)
+    //
+
+    /**
+     * Specify shape of network input.
+     * @param inputName automatically generated
+     * @param shape automatically generated
+     */
+    public void setInputShape(String inputName, MatOfInt shape) {
+        Mat shape_mat = shape;
+        setInputShape_0(nativeObj, inputName, shape_mat.nativeObj);
+    }
+
+
+    //
     // C++:  void cv::dnn::Net::setInputsNames(vector_String inputBlobNames)
     //
 
@@ -617,15 +632,13 @@ public class Net {
      * SEE: Target
      *
      * List of supported combinations backend / target:
-     * |                        | DNN_BACKEND_OPENCV | DNN_BACKEND_INFERENCE_ENGINE | DNN_BACKEND_HALIDE |  DNN_BACKEND_CUDA |
-     * |------------------------|--------------------|------------------------------|--------------------|-------------------|
-     * | DNN_TARGET_CPU         |                  + |                            + |                  + |                   |
-     * | DNN_TARGET_OPENCL      |                  + |                            + |                  + |                   |
-     * | DNN_TARGET_OPENCL_FP16 |                  + |                            + |                    |                   |
-     * | DNN_TARGET_MYRIAD      |                    |                            + |                    |                   |
-     * | DNN_TARGET_FPGA        |                    |                            + |                    |                   |
-     * | DNN_TARGET_CUDA        |                    |                              |                    |                 + |
-     * | DNN_TARGET_CUDA_FP16   |                    |                              |                    |                 + |
+     * |                        | DNN_BACKEND_OPENCV | DNN_BACKEND_INFERENCE_ENGINE | DNN_BACKEND_HALIDE |
+     * |------------------------|--------------------|------------------------------|--------------------|
+     * | DNN_TARGET_CPU         |                  + |                            + |                  + |
+     * | DNN_TARGET_OPENCL      |                  + |                            + |                  + |
+     * | DNN_TARGET_OPENCL_FP16 |                  + |                            + |                    |
+     * | DNN_TARGET_MYRIAD      |                    |                            + |                    |
+     * | DNN_TARGET_FPGA        |                    |                            + |                    |
      */
     public void setPreferableTarget(int targetId) {
         setPreferableTarget_0(nativeObj, targetId);
@@ -731,6 +744,9 @@ public class Net {
     private static native void setInput_1(long nativeObj, long blob_nativeObj, String name, double scalefactor);
     private static native void setInput_2(long nativeObj, long blob_nativeObj, String name);
     private static native void setInput_3(long nativeObj, long blob_nativeObj);
+
+    // C++:  void cv::dnn::Net::setInputShape(String inputName, MatShape shape)
+    private static native void setInputShape_0(long nativeObj, String inputName, long shape_mat_nativeObj);
 
     // C++:  void cv::dnn::Net::setInputsNames(vector_String inputBlobNames)
     private static native void setInputsNames_0(long nativeObj, List<String> inputBlobNames);

@@ -13,6 +13,6 @@ public final class BuildConfig {
   public static final String APPLICATION_ID = "org.opencv";
   public static final String BUILD_TYPE = "debug";
   public static final String FLAVOR = "";
-  public static final int VERSION_CODE = 4200;
-  public static final String VERSION_NAME = "4.2.0";
+  public static final int VERSION_CODE = 34100;
+  public static final String VERSION_NAME = "3.4.10";
 }

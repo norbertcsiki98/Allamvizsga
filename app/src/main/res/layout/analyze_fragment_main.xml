@@ -1,59 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/analyzefragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AnalyzeActivity"
+    android:layout_marginLeft="10dp"
     android:layout_marginTop="10dp"
     android:layout_marginRight="10dp"
-    android:layout_marginLeft="10dp"
-    android:id="@+id/analyzefragment"
-    >
-
-
-       <Button
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:id="@+id/defaultformationsbutton"
-           android:layout_marginLeft="250dp"
-           android:text="Default Formations"
-           android:textStyle="italic"
-
-
-
-           />
-
-    <ImageView
-        android:layout_width="145dp"
-        android:layout_height="145dp"
-        android:id="@+id/imageView1"
-        android:src="@drawable/defaultpic"
-        android:layout_marginTop="140dp"
-        />
-
-
-    <ImageView
-        android:layout_width="145dp"
-        android:layout_height="145dp"
-        android:id="@+id/imageView2"
-        android:layout_toEndOf="@+id/imageView1"
-        android:layout_marginLeft="45dp"
-        android:src="@drawable/defaultpic"
-        android:layout_marginTop="140dp"
-        />
+    tools:context=".AnalyzeActivity">
 
 
     <Button
+        android:id="@+id/defaultformationsbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="250dp"
+        android:text="Default Formations"
+        android:textStyle="italic"
+
+
+        />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="145dp"
+        android:layout_height="145dp"
+        android:layout_marginTop="140dp"
+        android:src="@drawable/defaultpic" />
+
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="145dp"
+        android:layout_height="145dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="140dp"
+        android:layout_toEndOf="@+id/imageView1"
+        android:src="@drawable/defaultpic" />
+
+
+    <Button
+        android:id="@+id/analyzebutton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/analyzebutton"
-        android:text="Analyze"
-        android:textSize="20sp"
         android:layout_below="@+id/imageView1"
         android:layout_centerHorizontal="true"
-        android:textStyle="italic"
         android:layout_marginTop="200dp"
-        />
+        android:text="Analyze"
+        android:textSize="20sp"
+        android:textStyle="italic" />
 
 
 </RelativeLayout>
