@@ -50,6 +50,7 @@ public class FormationsGalleryFragment extends Fragment {
         images.add(R.drawable.formation4);
         images.add(R.drawable.formation5);
 
+
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         recyclerView=view.findViewById(R.id.my_recyclerView);
         recyclerView.setHasFixedSize(true);

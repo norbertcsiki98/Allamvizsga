@@ -44,9 +44,11 @@ public class GalleryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ArrayList<Integer> images = new ArrayList<>();
-        images.add(R.drawable.ic_menu_camera);
-        images.add(R.drawable.ic_menu_send);
-        images.add(R.drawable.ic_menu_gallery);
+        images.add(R.drawable.formation3);
+        images.add(R.drawable.formation4);
+        images.add(R.drawable.formation5);
+        images.add(R.drawable.real_image);
+        images.add(R.drawable.test_image);
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         recyclerView=view.findViewById(R.id.my_recyclerView);
         recyclerView.setHasFixedSize(true);

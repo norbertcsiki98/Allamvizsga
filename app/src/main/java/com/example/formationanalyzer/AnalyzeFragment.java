@@ -25,13 +25,14 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 
 public class AnalyzeFragment extends Fragment {
     public static final String TAG = AnalyzeFragment.class.getCanonicalName();
 
-    ImageView img1, img2;
+    ImageView img1;
     Button defaultFormationsButton;
     Button analyzebutton;
     Bitmap bitmap;
@@ -40,9 +41,9 @@ public class AnalyzeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.analyze_fragment_main, container, false);
         img1 = v.findViewById(R.id.imageView1);
-        img2 = v.findViewById(R.id.imageView2);
         defaultFormationsButton = v.findViewById(R.id.defaultformationsbutton);
         analyzebutton = v.findViewById(R.id.analyzebutton);
+
 
         if (this.getArguments() != null) {
             Glide.with(v)
@@ -53,7 +54,7 @@ public class AnalyzeFragment extends Fragment {
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             super.onResourceReady(resource, transition);
 
-                            bitmap = resource;
+                            bitmap = resource.copy(Bitmap.Config.ARGB_8888, true);
                         }
                     });
         }
@@ -87,6 +88,8 @@ public class AnalyzeFragment extends Fragment {
             }
         });
 
+
+
         return v;
     }
 
@@ -96,20 +99,22 @@ public class AnalyzeFragment extends Fragment {
         }
 
         Log.d(TAG, "detect colors");
-        Mat mat = new Mat(bitmap.getWidth(), bitmap.getHeight(),
-                CvType.CV_8UC3);
+        Mat mat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
 
-        Mat hsv_image = new Mat();
+        Mat hsvImage = new Mat();
         Utils.bitmapToMat(bitmap, mat);
-        Imgproc.cvtColor(mat, hsv_image, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(mat, hsvImage, Imgproc.COLOR_RGB2HSV_FULL);
 
-        Mat lower_red_hue_range = new Mat();
-        Mat upper_red_hue_range = new Mat();
+        Mat lowerRedHueRange = new Mat();
+        Core.inRange(hsvImage, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lowerRedHueRange);
 
-        Core.inRange(hsv_image, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lower_red_hue_range);
-        Core.inRange(hsv_image, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upper_red_hue_range);
-        Utils.matToBitmap(hsv_image, bitmap);
+        Mat kernel = new Mat(new Size(1, 1), CvType.CV_8UC1, new Scalar(255));
+        Imgproc.morphologyEx(lowerRedHueRange, lowerRedHueRange, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(lowerRedHueRange, lowerRedHueRange, Imgproc.MORPH_DILATE, kernel);
+        Utils.matToBitmap(lowerRedHueRange, bitmap);
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        img2.setImageBitmap(mutableBitmap);
+        img1.setImageBitmap(mutableBitmap);
+
+        //Imgproc.findContours();
     }
 }

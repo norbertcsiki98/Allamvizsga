@@ -12,53 +12,29 @@
         android:id="@+id/logo"
         android:layout_width="280dp"
         android:layout_height="150dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="120dp"
         android:src="@drawable/ic_menu_send" />
 
     <TextView
-        android:id="@+id/chooseAlgText"
+        android:id="@+id/welcomeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/logo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="70dp"
-        android:text="Choose an Algorithm"
+        android:text="Hello, This is the Formation Analyzer mobile application."
         android:textColor="#000000"
         android:textSize="30sp"
-
         android:textStyle="italic" />
 
-
-    <RadioGroup
-        android:id="@+id/radioAlg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp">
-
-        <RadioButton
-            android:id="@+id/radioAlgOne"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Algorithm One"
-            android:textSize="25sp" />
-
-        <RadioButton
-            android:id="@+id/radioAlgTwo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Algorithm Two"
-            android:textSize="25sp" />
-
-    </RadioGroup>
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:text="Start"
+        android:layout_marginTop="120dp"
+        android:text="Let's try it!"
         android:textSize="20sp" />
 </LinearLayout>
