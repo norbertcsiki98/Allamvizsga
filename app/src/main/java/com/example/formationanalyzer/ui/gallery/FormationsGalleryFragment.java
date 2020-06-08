@@ -25,21 +25,6 @@ import java.util.List;
 
 public class FormationsGalleryFragment extends Fragment {
 
-
-
-    GalleryInterface imageselected2 = new GalleryInterface() {
-        @Override
-        public void itemSelected(Integer name) {
-            Fragment newFragment = new AnalyzeFragment();
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.fragment_container, newFragment );
-            ft.commit();
-            Bundle b = new Bundle();
-            b.putInt("myname", name);
-            newFragment.setArguments(b);
-
-        }
-    };
     RecyclerView recyclerView;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -57,7 +42,7 @@ public class FormationsGalleryFragment extends Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(view.getContext(),3);
 
         recyclerView.setLayoutManager(layoutManager);
-        GalleryAdapter mAdapter = new GalleryAdapter(images, view.getContext(),imageselected2);
+        GalleryAdapter mAdapter = new GalleryAdapter(images, view.getContext(), null);
         recyclerView.setAdapter(mAdapter);
 
 

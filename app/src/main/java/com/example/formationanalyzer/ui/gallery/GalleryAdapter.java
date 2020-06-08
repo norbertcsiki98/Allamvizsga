@@ -1,14 +1,15 @@
 package com.example.formationanalyzer.ui.gallery;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.formationanalyzer.R;
 
@@ -62,7 +63,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   onClick2(v);
+                    onClick2(v);
                 }
             });
 
@@ -72,10 +73,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
         public void onClick2(View view) {
             int position = getLayoutPosition();
             clicked_url = images.get(position);
-            Toast.makeText(view.getContext(),"item is clicked", Toast.LENGTH_SHORT).show();
-           // Log.d("HELLO",clicked_url);
-            item.itemSelected(clicked_url);
-
+            Toast.makeText(view.getContext(), "item is clicked", Toast.LENGTH_SHORT).show();
+            if (item != null) {
+                item.itemSelected(clicked_url);
+            }
         }
 
     }
