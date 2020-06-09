@@ -1,6 +1,8 @@
 package com.example.formationanalyzer.ui.gallery;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +19,13 @@ import java.util.ArrayList;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHolder> {
 
-    ArrayList<Integer> images;
+    ArrayList<String> images;
     Context ctx;
     GalleryInterface item;
-    Integer clicked_url;
+    String clicked_url;
 
 
-    public GalleryAdapter(ArrayList<Integer> images, Context ctx, GalleryInterface item) {
+    public GalleryAdapter(ArrayList<String> images, Context ctx, GalleryInterface item) {
         this.images = images;
         this.ctx = ctx;
         this.item = item;
@@ -41,10 +43,27 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        int k = images.get(position);
-        Glide.with(ctx).load(k).into(holder.image);
+        String k = images.get(position);
+        int id = getDrawableFromString(k,ctx);
+        if (id != 0) {
+            Glide.with(ctx).load(id).into(holder.image);
+        }
+        else{
+            Glide.with(ctx).load(k).into(holder.image);
+        }
     }
 
+    public int getDrawableFromString(String imageName, Context context) {
+        if (TextUtils.isEmpty(imageName)) {
+            return 0;
+        }
+
+        Resources resources = context.getResources();
+        final int resourceId = resources.getIdentifier(imageName, "drawable",
+                context.getPackageName());
+
+        return resourceId;
+    }
     @Override
     public int getItemCount() {
         return images.size();

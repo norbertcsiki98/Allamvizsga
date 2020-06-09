@@ -1,11 +1,16 @@
 package com.example.formationanalyzer;
 
+
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,9 +32,18 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 public class AnalyzeFragment extends Fragment {
@@ -64,9 +78,10 @@ public class AnalyzeFragment extends Fragment {
 
         isLoaded = false;
         if (this.getArguments() != null) {
+            String imageUrl = this.getArguments().getString("myname");
             Glide.with(v)
                     .asBitmap()
-                    .load(this.getArguments().getInt("myname"))
+                    .load(getDrawableFromString(imageUrl,this.getContext()))
                     .placeholder(getResources().getDrawable(R.drawable.defaultpic))
                     .into(new BitmapImageViewTarget(img1) {
                         @Override
@@ -148,6 +163,18 @@ public class AnalyzeFragment extends Fragment {
         return v;
     }
 
+    public int getDrawableFromString(String imageName, Context context) {
+        if (TextUtils.isEmpty(imageName)) {
+            return 0;
+        }
+
+        Resources resources = context.getResources();
+        final int resourceId = resources.getIdentifier(imageName, "drawable",
+                context.getPackageName());
+
+        return resourceId;
+    }
+
     private void detectColors() {
         if (!isLoaded) {
             Log.d(TAG, "The bitmap is null.");
@@ -175,6 +202,65 @@ public class AnalyzeFragment extends Fragment {
         Mat kernel = new Mat(new Size(1, 1), CvType.CV_8UC1, new Scalar(hsvColor[0]));
         Imgproc.morphologyEx(lowerRedHueRange, lowerRedHueRange, Imgproc.MORPH_OPEN, kernel);
         Imgproc.morphologyEx(lowerRedHueRange, lowerRedHueRange, Imgproc.MORPH_DILATE, kernel);
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(lowerRedHueRange, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        contours.sort(new Comparator<MatOfPoint>() {
+            @Override
+            public int compare(MatOfPoint o1, MatOfPoint o2) {
+                return Double.compare(Imgproc.contourArea(o2), Imgproc.contourArea(o1));
+            }
+        });
+
+        List<Pair<Integer, Integer>> coordinates = new ArrayList<>();
+        for (int i = 0; i < contours.size(); i++) {
+            MatOfPoint contour = contours.get(i);
+            Log.d(TAG, "Area: " + Imgproc.contourArea(contours.get(i)));
+            if (Imgproc.contourArea(contours.get(i)) > 30) {
+                Scalar colour = new Scalar(90, 255, 255);
+                Imgproc.drawContours(lowerRedHueRange, contours, i, colour, -1);
+                MatOfInt hull = new MatOfInt();
+                Imgproc.convexHull(contour, hull);
+
+                List<Point> l = new ArrayList<>();
+                l.clear();
+                double sum_x = 0;
+                double sum_y = 0;
+                int j;
+                for (j = 0; j < hull.size().height; j++) {
+                    l.add(contour.toList().get(hull.toList().get(j)));
+                    sum_x += l.get(j).x;
+                    sum_y += l.get(j).y;
+                }
+
+                int x = (int) (sum_x / j);
+                int y = (int) (sum_y / j);
+                coordinates.add(Pair.create(x, y));
+            } else {
+                break;
+            }
+        }
+
+        List<Pair<Integer, Integer>> finalCoordinates = new ArrayList<>();
+
+        for (int i = 0; i < coordinates.size(); i++) {
+            boolean isGood = true;
+            for (int j = 0; j < finalCoordinates.size(); j++) {
+                if (Math.abs(coordinates.get(i).first - finalCoordinates.get(j).first) < 20
+                        || Math.abs(coordinates.get(i).second - finalCoordinates.get(j).second) < 20) {
+                    isGood = false;
+                    break;
+                }
+            }
+            if (isGood) {
+                finalCoordinates.add(coordinates.get(i));
+            }
+        }
+
+        for (int i = 0; i < finalCoordinates.size(); i++) {
+            Log.d(TAG, i + ". item x coordinate: " + finalCoordinates.get(i).first + "; y coordinate: " + finalCoordinates.get(i).second);
+        }
+
         Utils.matToBitmap(lowerRedHueRange, bitmap);
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         img1.setImageBitmap(mutableBitmap);

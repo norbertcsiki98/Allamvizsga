@@ -28,13 +28,11 @@ public class FormationsGalleryFragment extends Fragment {
     RecyclerView recyclerView;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        ArrayList<Integer> images = new ArrayList<>();
-        images.add(R.drawable.formation1);
-        images.add(R.drawable.formation2);
-        images.add(R.drawable.formation3);
-        images.add(R.drawable.formation4);
-        images.add(R.drawable.formation5);
-
+        ArrayList<String> images = new ArrayList<>();
+        images.add("formation1");
+        images.add("formation2");
+        images.add("formation3");
+        images.add("formation4");
 
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         recyclerView=view.findViewById(R.id.my_recyclerView);
