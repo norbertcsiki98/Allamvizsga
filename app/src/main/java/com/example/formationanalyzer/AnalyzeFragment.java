@@ -79,9 +79,10 @@ public class AnalyzeFragment extends Fragment {
         isLoaded = false;
         if (this.getArguments() != null) {
             String imageUrl = this.getArguments().getString("myname");
+            int id = getDrawableFromString(imageUrl,v.getContext());
             Glide.with(v)
                     .asBitmap()
-                    .load(getDrawableFromString(imageUrl,this.getContext()))
+                    .load(id != 0 ? id : imageUrl)
                     .placeholder(getResources().getDrawable(R.drawable.defaultpic))
                     .into(new BitmapImageViewTarget(img1) {
                         @Override
