@@ -16,8 +16,6 @@ public class GalleryImagesSingleton {
 
     private GalleryImagesSingleton() {
         images = new ArrayList<String>();
-        images.add("formation4");
-        images.add("formation5");
         images.add("real_image");
         images.add("real_image2");
         images.add("test_image");
