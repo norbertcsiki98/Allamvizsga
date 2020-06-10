@@ -29,26 +29,12 @@ public class FormationsGalleryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         ArrayList<String> images = new ArrayList<>();
-        images.add("formation_3142");
-        images.add("formation_3412");
-        images.add("formation_3421");
-        images.add("formation_343");
-        images.add("formation_352");
-        images.add("formation_41212_1");
-        images.add("formation_41212_2");
-        images.add("formation_4132");
-        images.add("formation_4141");
-        images.add("formation_4222");
-        images.add("formation_4231");
-        images.add("formation_424");
-        images.add("formation_4321");
-        images.add("formation_433_1");
-        images.add("formation_433_2");
-        images.add("formation_433_3");
-        images.add("formation_433_4");
-        images.add("formation_442");
-        images.add("formation_451_1");
-        images.add("formation_451_2");
+        images.add("lineup343");
+        images.add("lineup4222");
+        images.add("lineup4231");
+        images.add("lineup433");
+        images.add("lineup442");
+
 
 
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);

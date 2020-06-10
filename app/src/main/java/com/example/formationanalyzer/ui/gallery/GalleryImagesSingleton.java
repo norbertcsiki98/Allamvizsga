@@ -22,6 +22,9 @@ public class GalleryImagesSingleton {
         images.add("real_image3");
         images.add("real_image5");
         images.add("real_image7");
+        images.add("real_image8");
+        images.add("real_image9");
+
     }
 
     // retrieve array from anywhere

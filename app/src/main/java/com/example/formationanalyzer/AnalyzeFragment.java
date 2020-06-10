@@ -195,6 +195,7 @@ public class AnalyzeFragment extends Fragment {
         Log.d(TAG, "HSV: " + hsvColor[0] + " - " + hsvColor[1] + " - " + hsvColor[2]);
 
         Mat lowerRedHueRange = new Mat();
+        hsvColor[0]= 0;
         int lowerHue = (int) (hsvColor[0] / 2 - 10);
         int upperHue = (int) (hsvColor[0] / 2 + 10);
         Core.inRange(hsvImage, new Scalar(lowerHue < 0 ? 0 : lowerHue, hsvColor[1] * 100, hsvColor[2] * 100),
