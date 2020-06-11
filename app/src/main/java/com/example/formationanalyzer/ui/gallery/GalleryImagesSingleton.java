@@ -15,7 +15,7 @@ public class GalleryImagesSingleton {
     }
 
     private GalleryImagesSingleton() {
-        images = new ArrayList<String>();
+        images = new ArrayList<>();
         images.add("real_image");
         images.add("real_image2");
         images.add("test_image");
@@ -24,6 +24,7 @@ public class GalleryImagesSingleton {
         images.add("real_image7");
         images.add("real_image8");
         images.add("real_image9");
+        images.add("real_image10");
 
     }
 

@@ -40,10 +40,10 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class AnalyzeFragment extends Fragment {
@@ -55,6 +55,13 @@ public class AnalyzeFragment extends Fragment {
     View colorView;
     int redColor, greenColor, blueColor;
     boolean isLoaded;
+    private Map<String, List<Pair<Integer, Integer>>> defaultFormations = new HashMap<>();
+    String imageUrl ;
+    String selectedFormation = "";
+
+    public AnalyzeFragment() {
+        createDefaultFormations();
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -77,9 +84,10 @@ public class AnalyzeFragment extends Fragment {
         img1.buildDrawingCache(true);
 
         isLoaded = false;
+
         if (this.getArguments() != null) {
-            String imageUrl = this.getArguments().getString("myname");
-            int id = getDrawableFromString(imageUrl,v.getContext());
+            imageUrl =this.getArguments().getString("myname");
+            int id = getDrawableFromString(imageUrl, v.getContext());
             Glide.with(v)
                     .asBitmap()
                     .load(id != 0 ? id : imageUrl)
@@ -158,13 +166,98 @@ public class AnalyzeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 detectColors();
+                Fragment newFragment = new ResultFragment();
+                Bundle b = new Bundle();
+                b.putString("selectedimage",imageUrl);
+                b.putString("selectedformation",selectedFormation);
+                newFragment.setArguments(b);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container, newFragment);
+                ft.addToBackStack(null);
+                ft.commit();
+
+
             }
         });
 
         return v;
     }
 
-    public int getDrawableFromString(String imageName, Context context) {
+    private void createDefaultFormations() {
+        // 4-3-3
+        List<Pair<Integer, Integer>> coordinates = new ArrayList<>();
+        coordinates.add(Pair.create(0, 0));
+        coordinates.add(Pair.create(0, 33));
+        coordinates.add(Pair.create(0, 66));
+        coordinates.add(Pair.create(0, 100));
+        coordinates.add(Pair.create(46, 16));
+        coordinates.add(Pair.create(46, 50));
+        coordinates.add(Pair.create(46, 84));
+        coordinates.add(Pair.create(97, 10));
+        coordinates.add(Pair.create(100, 50));
+        coordinates.add(Pair.create(97, 90));
+        defaultFormations.put("lineup433", coordinates);
+
+        //3-4-3
+        coordinates = new ArrayList<>();
+        coordinates.add(Pair.create(0, 20));
+        coordinates.add(Pair.create(0, 50));
+        coordinates.add(Pair.create(0, 80));
+        coordinates.add(Pair.create(52, 0));
+        coordinates.add(Pair.create(52, 30));
+        coordinates.add(Pair.create(52, 70));
+        coordinates.add(Pair.create(52, 100));
+        coordinates.add(Pair.create(94, 0));
+        coordinates.add(Pair.create(100, 50));
+        coordinates.add(Pair.create(94, 100));
+        defaultFormations.put("lineup343", coordinates);
+
+        //4-4-2
+        coordinates = new ArrayList<>();
+        coordinates.add(Pair.create(0, 0));
+        coordinates.add(Pair.create(0, 33));
+        coordinates.add(Pair.create(0, 66));
+        coordinates.add(Pair.create(0, 100));
+        coordinates.add(Pair.create(47, 0));
+        coordinates.add(Pair.create(47, 33));
+        coordinates.add(Pair.create(47, 66));
+        coordinates.add(Pair.create(47, 100));
+        coordinates.add(Pair.create(100, 33));
+        coordinates.add(Pair.create(100, 66));
+        defaultFormations.put("lineup442", coordinates);
+
+        //4-2-3-1
+        coordinates = new ArrayList<>();
+        coordinates.add(Pair.create(0, 0));
+        coordinates.add(Pair.create(0, 33));
+        coordinates.add(Pair.create(0, 66));
+        coordinates.add(Pair.create(0, 100));
+        coordinates.add(Pair.create(37, 29));
+        coordinates.add(Pair.create(37, 67));
+        coordinates.add(Pair.create(68, 8));
+        coordinates.add(Pair.create(68, 51));
+        coordinates.add(Pair.create(68, 100));
+        coordinates.add(Pair.create(68, 51));
+        defaultFormations.put("lineup4231", coordinates);
+
+        //4-2-2-2
+        coordinates = new ArrayList<>();
+        coordinates.add(Pair.create(0, 0));
+        coordinates.add(Pair.create(0, 33));
+        coordinates.add(Pair.create(0, 66));
+        coordinates.add(Pair.create(0, 100));
+        coordinates.add(Pair.create(48, 33));
+        coordinates.add(Pair.create(48, 66));
+        coordinates.add(Pair.create(78, 0));
+        coordinates.add(Pair.create(78, 100));
+        coordinates.add(Pair.create(100, 33));
+        coordinates.add(Pair.create(100, 66));
+        defaultFormations.put("lineup4222", coordinates);
+    }
+
+
+
+    private int getDrawableFromString(String imageName, Context context) {
         if (TextUtils.isEmpty(imageName)) {
             return 0;
         }
@@ -195,7 +288,6 @@ public class AnalyzeFragment extends Fragment {
         Log.d(TAG, "HSV: " + hsvColor[0] + " - " + hsvColor[1] + " - " + hsvColor[2]);
 
         Mat lowerRedHueRange = new Mat();
-        hsvColor[0]= 0;
         int lowerHue = (int) (hsvColor[0] / 2 - 10);
         int upperHue = (int) (hsvColor[0] / 2 + 10);
         Core.inRange(hsvImage, new Scalar(lowerHue < 0 ? 0 : lowerHue, hsvColor[1] * 100, hsvColor[2] * 100),
@@ -218,29 +310,29 @@ public class AnalyzeFragment extends Fragment {
         for (int i = 0; i < contours.size(); i++) {
             MatOfPoint contour = contours.get(i);
             Log.d(TAG, "Area: " + Imgproc.contourArea(contours.get(i)));
-            if (Imgproc.contourArea(contours.get(i)) > 30) {
-                Scalar colour = new Scalar(90, 255, 255);
-                Imgproc.drawContours(lowerRedHueRange, contours, i, colour, -1);
-                MatOfInt hull = new MatOfInt();
-                Imgproc.convexHull(contour, hull);
+            //  if (Imgproc.contourArea(contours.get(i)) > 30) {
+            Scalar colour = new Scalar(90, 255, 255);
+            Imgproc.drawContours(lowerRedHueRange, contours, i, colour, -1);
+            MatOfInt hull = new MatOfInt();
+            Imgproc.convexHull(contour, hull);
 
-                List<Point> l = new ArrayList<>();
-                l.clear();
-                double sum_x = 0;
-                double sum_y = 0;
-                int j;
-                for (j = 0; j < hull.size().height; j++) {
-                    l.add(contour.toList().get(hull.toList().get(j)));
-                    sum_x += l.get(j).x;
-                    sum_y += l.get(j).y;
-                }
-
-                int x = (int) (sum_x / j);
-                int y = (int) (sum_y / j);
-                coordinates.add(Pair.create(x, y));
-            } else {
-                break;
+            List<Point> l = new ArrayList<>();
+            l.clear();
+            double sum_x = 0;
+            double sum_y = 0;
+            int j;
+            for (j = 0; j < hull.size().height; j++) {
+                l.add(contour.toList().get(hull.toList().get(j)));
+                sum_x += l.get(j).x;
+                sum_y += l.get(j).y;
             }
+
+            int x = (int) (sum_x / j);
+            int y = (int) (sum_y / j);
+            coordinates.add(Pair.create(x, y));
+//            } else {
+//                break;
+//            }
         }
 
         List<Pair<Integer, Integer>> finalCoordinates = new ArrayList<>();
@@ -263,8 +355,108 @@ public class AnalyzeFragment extends Fragment {
             Log.d(TAG, i + ". item x coordinate: " + finalCoordinates.get(i).first + "; y coordinate: " + finalCoordinates.get(i).second);
         }
 
-        Utils.matToBitmap(lowerRedHueRange, bitmap);
-        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        img1.setImageBitmap(mutableBitmap);
+//        Utils.matToBitmap(lowerRedHueRange, bitmap);
+//        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+//        img1.setImageBitmap(mutableBitmap);
+
+        checkFormations(finalCoordinates);
+    }
+
+    private void checkFormations(List<Pair<Integer, Integer>> finalCoordinates) {
+        if (finalCoordinates.size() == 0) {
+            return;
+        }
+
+        int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = 0, maxY = 0;
+        for (int i = 0; i < finalCoordinates.size(); i++) {
+            Pair<Integer, Integer> coordinate = finalCoordinates.get(i);
+
+            if (coordinate.first < minX) {
+                minX = coordinate.first;
+            }
+
+            if (coordinate.second < minY) {
+                minY = coordinate.second;
+            }
+
+            if (coordinate.first > maxX) {
+                maxX = coordinate.first;
+            }
+
+            if (coordinate.second > maxY) {
+                maxY = coordinate.second;
+            }
+        }
+
+        List<Pair<Integer, Integer>> coordinates = new ArrayList<>();
+        for (int i = 0; i < finalCoordinates.size(); i++) {
+            Pair<Integer, Integer> coordinate = finalCoordinates.get(i);
+
+            coordinates.add(Pair.create(coordinate.first - minX, coordinate.second - minY));
+        }
+
+        maxX -= minX;
+        maxY -= minY;
+
+        if (maxX == 0 || maxY == 0) {
+            return;
+        }
+
+        List<Pair<Integer, Integer>> coordinatesInPercentage = new ArrayList<>();
+        for (int i = 0; i < coordinates.size(); i++) {
+            Pair<Integer, Integer> coordinate = coordinates.get(i);
+
+            int xInPercentage = coordinate.first * 100 / maxX;
+            int yInPercentage = coordinate.second * 100 / maxY;
+
+            coordinatesInPercentage.add(Pair.create(xInPercentage, yInPercentage));
+        }
+
+        for (int i = 0; i < coordinatesInPercentage.size(); i++) {
+            Log.d(TAG, "X: " + coordinatesInPercentage.get(i).first + " Y: " + coordinatesInPercentage.get(i).second);
+        }
+
+        Map<String, Integer> result = new HashMap<>();
+        for (String key : defaultFormations.keySet()) {
+            List<Pair<Integer, Integer>> lineUp = defaultFormations.get(key);
+
+            int counter = 0;
+            for (int j = 0; j < coordinatesInPercentage.size(); j++) {
+                Pair<Integer, Integer> selectedCoordinate = coordinatesInPercentage.get(j);
+
+                int removePosition = -1;
+                for (int k = 0; k < lineUp.size(); k++) {
+                    Pair<Integer, Integer> currentCoordinate = lineUp.get(k);
+                    if (selectedCoordinate.first >= currentCoordinate.first - 15 && selectedCoordinate.first <= currentCoordinate.first + 15
+                            && selectedCoordinate.second >= currentCoordinate.second - 15 && selectedCoordinate.second <= currentCoordinate.second + 15) {
+                        counter++;
+                        removePosition = k;
+                        break;
+                    }
+                }
+
+                if (removePosition != -1) {
+                    lineUp.remove(removePosition);
+                }
+            }
+
+            if (counter > 0) {
+                result.put(key, counter);
+            }
+        }
+
+        int maxCount = 0;
+
+        for (String key : result.keySet()) {
+            int count = result.get(key);
+            Log.d(TAG, "Formation name: " + key + " - count: " + count);
+
+            if (count > maxCount) {
+                selectedFormation = key;
+                maxCount = count;
+            }
+        }
+
+        Log.d(TAG, "Selected formation: " + selectedFormation);
     }
 }

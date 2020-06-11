@@ -36,7 +36,6 @@ public class FormationsGalleryFragment extends Fragment {
         images.add("lineup442");
 
 
-
         View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         recyclerView=view.findViewById(R.id.my_recyclerView);
         recyclerView.setHasFixedSize(true);

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/selected_picture_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Selected Picture: "
+        android:textColor="#000000"
+        android:textSize="30sp"
+        android:textStyle="italic" />
+
+    <ImageView
+        android:id="@+id/selected_picture"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@+id/selected_picture_text"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/defaultpic" />
+
+    <TextView
+        android:id="@+id/result_picture_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/selected_picture"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Detected formation: "
+        android:textColor="#000000"
+        android:textSize="30sp"
+        android:textStyle="italic" />
+
+    <ImageView
+        android:id="@+id/result_formation_picture"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@+id/result_picture_text"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/defaultpic" />
+
+
+</RelativeLayout>
