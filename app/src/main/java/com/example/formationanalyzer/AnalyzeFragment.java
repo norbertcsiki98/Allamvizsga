@@ -56,7 +56,7 @@ public class AnalyzeFragment extends Fragment {
     int redColor, greenColor, blueColor;
     boolean isLoaded;
     private Map<String, List<Pair<Integer, Integer>>> defaultFormations = new HashMap<>();
-    String imageUrl ;
+    String imageUrl;
     String selectedFormation = "";
 
     public AnalyzeFragment() {
@@ -86,7 +86,7 @@ public class AnalyzeFragment extends Fragment {
         isLoaded = false;
 
         if (this.getArguments() != null) {
-            imageUrl =this.getArguments().getString("myname");
+            imageUrl = this.getArguments().getString("myname");
             int id = getDrawableFromString(imageUrl, v.getContext());
             Glide.with(v)
                     .asBitmap()
@@ -193,9 +193,9 @@ public class AnalyzeFragment extends Fragment {
         coordinates.add(Pair.create(46, 16));
         coordinates.add(Pair.create(46, 50));
         coordinates.add(Pair.create(46, 84));
-        coordinates.add(Pair.create(97, 10));
+        coordinates.add(Pair.create(97, 15));
         coordinates.add(Pair.create(100, 50));
-        coordinates.add(Pair.create(97, 90));
+        coordinates.add(Pair.create(97, 85));
         defaultFormations.put("lineup433", coordinates);
 
         //3-4-3
@@ -256,7 +256,6 @@ public class AnalyzeFragment extends Fragment {
     }
 
 
-
     private int getDrawableFromString(String imageName, Context context) {
         if (TextUtils.isEmpty(imageName)) {
             return 0;
@@ -277,7 +276,7 @@ public class AnalyzeFragment extends Fragment {
 
         bitmap = img1.getDrawingCache();
         Log.d(TAG, "detect colors");
-        Mat mat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC1);
+        Mat mat = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC3);
 
         Mat hsvImage = new Mat();
         Utils.bitmapToMat(bitmap, mat);
@@ -293,12 +292,16 @@ public class AnalyzeFragment extends Fragment {
         Core.inRange(hsvImage, new Scalar(lowerHue < 0 ? 0 : lowerHue, hsvColor[1] * 100, hsvColor[2] * 100),
                 new Scalar(upperHue < 180 ? upperHue : 180, hsvColor[1] * 255, hsvColor[2] * 255), lowerRedHueRange);
 
-        Mat kernel = new Mat(new Size(1, 1), CvType.CV_8UC1, new Scalar(hsvColor[0]));
-        Imgproc.morphologyEx(lowerRedHueRange, lowerRedHueRange, Imgproc.MORPH_OPEN, kernel);
-        Imgproc.morphologyEx(lowerRedHueRange, lowerRedHueRange, Imgproc.MORPH_DILATE, kernel);
+        Mat imageAfterErode = new Mat();
+        Mat erode = Imgproc.getStructuringElement(Imgproc.MORPH_ERODE, new Size(1, 1));
+        Imgproc.erode(lowerRedHueRange, imageAfterErode, erode);
+
+        Mat imageAfterDilate = new Mat();
+        Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_DILATE, new Size(1, 1));
+        Imgproc.dilate(imageAfterErode, imageAfterDilate, dilate);
 
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(lowerRedHueRange, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(imageAfterDilate, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         contours.sort(new Comparator<MatOfPoint>() {
             @Override
             public int compare(MatOfPoint o1, MatOfPoint o2) {
@@ -312,7 +315,7 @@ public class AnalyzeFragment extends Fragment {
             Log.d(TAG, "Area: " + Imgproc.contourArea(contours.get(i)));
             //  if (Imgproc.contourArea(contours.get(i)) > 30) {
             Scalar colour = new Scalar(90, 255, 255);
-            Imgproc.drawContours(lowerRedHueRange, contours, i, colour, -1);
+            Imgproc.drawContours(imageAfterDilate, contours, i, colour, -1);
             MatOfInt hull = new MatOfInt();
             Imgproc.convexHull(contour, hull);
 
@@ -338,10 +341,11 @@ public class AnalyzeFragment extends Fragment {
         List<Pair<Integer, Integer>> finalCoordinates = new ArrayList<>();
 
         for (int i = 0; i < coordinates.size(); i++) {
+            Log.d(TAG, i + ".coordinate: " + coordinates.get(i).first + " - " + coordinates.get(i).second);
             boolean isGood = true;
             for (int j = 0; j < finalCoordinates.size(); j++) {
-                if (Math.abs(coordinates.get(i).first - finalCoordinates.get(j).first) < 20
-                        || Math.abs(coordinates.get(i).second - finalCoordinates.get(j).second) < 20) {
+                if (Math.abs(coordinates.get(i).first - finalCoordinates.get(j).first) < 100
+                        && Math.abs(coordinates.get(i).second - finalCoordinates.get(j).second) < 100) {
                     isGood = false;
                     break;
                 }
@@ -425,18 +429,28 @@ public class AnalyzeFragment extends Fragment {
                 Pair<Integer, Integer> selectedCoordinate = coordinatesInPercentage.get(j);
 
                 int removePosition = -1;
+                List<Pair<Integer, Integer>> possibleSolutions = new ArrayList<>();
                 for (int k = 0; k < lineUp.size(); k++) {
                     Pair<Integer, Integer> currentCoordinate = lineUp.get(k);
-                    if (selectedCoordinate.first >= currentCoordinate.first - 15 && selectedCoordinate.first <= currentCoordinate.first + 15
-                            && selectedCoordinate.second >= currentCoordinate.second - 15 && selectedCoordinate.second <= currentCoordinate.second + 15) {
-                        counter++;
-                        removePosition = k;
-                        break;
+                    if (Math.abs(selectedCoordinate.first - currentCoordinate.first) < 15 &&
+                            Math.abs(selectedCoordinate.second - currentCoordinate.second) < 15) {
+                        possibleSolutions.add(Pair.create(k,
+                                Math.abs(selectedCoordinate.first - currentCoordinate.first) +
+                                        Math.abs(selectedCoordinate.second - currentCoordinate.second)));
+                    }
+                }
+
+                int minDistance = Integer.MAX_VALUE;
+                for (int k = 0; k < possibleSolutions.size(); k++) {
+                    if (possibleSolutions.get(k).second < minDistance) {
+                        removePosition = possibleSolutions.get(k).first;
+                        minDistance = possibleSolutions.get(k).second;
                     }
                 }
 
                 if (removePosition != -1) {
                     lineUp.remove(removePosition);
+                    counter++;
                 }
             }
 
