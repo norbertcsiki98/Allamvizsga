@@ -472,7 +472,7 @@ public class AnalyzeFragment extends Fragment {
             Log.d(TAG, "Formation name: " + key + " - count: " + count);
 
             if (count > maxCount) {
-             //  selectedFormation = key;
+                selectedFormation = key;
                 maxCount = count;
             }
         }
