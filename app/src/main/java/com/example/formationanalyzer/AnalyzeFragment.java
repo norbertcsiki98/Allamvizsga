@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -135,7 +136,7 @@ public class AnalyzeFragment extends Fragment {
                     return false;
                 }
 
-                Log.d(TAG, "Action: " + event.getAction());
+                              Log.d(TAG, "Action: " + event.getAction());
                 if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP
                         || event.getAction() == MotionEvent.ACTION_MOVE) {
                     bitmap = img1.getDrawingCache();
@@ -296,12 +297,12 @@ public class AnalyzeFragment extends Fragment {
         Mat erode = Imgproc.getStructuringElement(Imgproc.MORPH_ERODE, new Size(1, 1));
         Imgproc.erode(lowerRedHueRange, imageAfterErode, erode);
 
-        Mat imageAfterDilate = new Mat();
-        Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_DILATE, new Size(1, 1));
-        Imgproc.dilate(imageAfterErode, imageAfterDilate, dilate);
+        //  Mat imageAfterDilate = new Mat();
+        //  Mat dilate = Imgproc.getStructuringElement(Imgproc.MORPH_DILATE, new Size(1, 1));
+        // Imgproc.dilate(imageAfterErode, imageAfterDilate, dilate);
 
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(imageAfterDilate, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(imageAfterErode, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         contours.sort(new Comparator<MatOfPoint>() {
             @Override
             public int compare(MatOfPoint o1, MatOfPoint o2) {
@@ -315,7 +316,7 @@ public class AnalyzeFragment extends Fragment {
             Log.d(TAG, "Area: " + Imgproc.contourArea(contours.get(i)));
             //  if (Imgproc.contourArea(contours.get(i)) > 30) {
             Scalar colour = new Scalar(90, 255, 255);
-            Imgproc.drawContours(imageAfterDilate, contours, i, colour, -1);
+            Imgproc.drawContours(imageAfterErode, contours, i, colour, -1);
             MatOfInt hull = new MatOfInt();
             Imgproc.convexHull(contour, hull);
 
@@ -359,9 +360,9 @@ public class AnalyzeFragment extends Fragment {
             Log.d(TAG, i + ". item x coordinate: " + finalCoordinates.get(i).first + "; y coordinate: " + finalCoordinates.get(i).second);
         }
 
-//        Utils.matToBitmap(lowerRedHueRange, bitmap);
-//        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-//        img1.setImageBitmap(mutableBitmap);
+ //       Utils.matToBitmap(lowerRedHueRange, bitmap);
+  //      Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+  //      img1.setImageBitmap(mutableBitmap);
 
         checkFormations(finalCoordinates);
     }
@@ -454,8 +455,13 @@ public class AnalyzeFragment extends Fragment {
                 }
             }
 
-            if (counter > 0) {
+            if (counter > 5) {
                 result.put(key, counter);
+            }
+            else
+            {
+                Toast.makeText(getContext(), "The count of the detected players are not enough to" +
+                        " get the corect formations. Please try again. ", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -466,10 +472,14 @@ public class AnalyzeFragment extends Fragment {
             Log.d(TAG, "Formation name: " + key + " - count: " + count);
 
             if (count > maxCount) {
-                selectedFormation = key;
+             //  selectedFormation = key;
                 maxCount = count;
             }
         }
+
+
+
+
 
         Log.d(TAG, "Selected formation: " + selectedFormation);
     }
